@@ -11,6 +11,7 @@ Unity / C# 기반 클라이언트 프로그래머입니다.
 
 | 프로젝트 | 분류 | 설명 |
 | --- | --- | --- |
+| [minigames](https://github.com/Frenil-client/minigames) | 게임플레이 / 아키텍처 | 미니게임 플랫폼. 허브 씬에서 게임을 Additive 로드/언로드하는 확장형 구조 — IMiniGame 생명주기 계약, ScriptableObject 데이터 드리븐 게임 등록, 타워 디펜스·타이밍 게임 2종 구현 |
 | [unity-maplightdata-tool](https://github.com/Frenil-client/unity-maplightdata-tool) | 렌더링 / 에디터 툴 | 씬별 조명 환경을 ScriptableObject로 관리. Primary/Additive 스택 기반 자동 복원, Addressables 에디터 자동화 포함 |
 | [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 시스템 설계 | 제네릭 기반 RPG 스탯 시스템. StatId enum, Reflection 캐싱, MaxValue 무결성 검사 포함 |
 | [unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system) | UI 시스템 | 트리 구조 기반 레드닷 시스템. enum 노드 타입, 자동 상위 전파, 카운트 아이콘 지원 |
