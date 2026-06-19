@@ -11,6 +11,7 @@ Unity / C# 기반 클라이언트 프로그래머입니다.
 
 | 프로젝트 | 분류 | 설명 |
 | --- | --- | --- |
+| [unity-urp-shader-lab](https://github.com/Frenil-client/unity-urp-shader-lab) | 렌더링 / 셰이더 | URP 기반 서브컬쳐(애니메이션) 스타일 NPR 렌더링 랩. Shader Graph 없이 HLSL 직접 작성 — 셀 셰이딩·SDF 페이스 셰도우·헤어 이방성·아웃라인 구현 + SDF/스무딩 노멀 베이커 등 NPR 아트 파이프라인 툴 직접 설계 |
 | [minigames](https://github.com/Frenil-client/minigames) | 게임플레이 / 아키텍처 | 미니게임 플랫폼. 허브 씬에서 게임을 Additive 로드/언로드하는 확장형 구조 — IMiniGame 생명주기 계약, ScriptableObject 데이터 드리븐 게임 등록, 타워 디펜스·타이밍 게임 2종 구현 |
 | [unity-maplightdata-tool](https://github.com/Frenil-client/unity-maplightdata-tool) | 렌더링 / 에디터 툴 | 씬별 조명 환경을 ScriptableObject로 관리. Primary/Additive 스택 기반 자동 복원, Addressables 에디터 자동화 포함 |
 | [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 시스템 설계 | 제네릭 기반 RPG 스탯 시스템. StatId enum, Reflection 캐싱, MaxValue 무결성 검사 포함 |
