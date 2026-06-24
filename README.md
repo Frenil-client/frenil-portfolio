@@ -12,6 +12,7 @@ Unity / C# 기반 클라이언트 프로그래머입니다.
 | 프로젝트 | 분류 | 설명 |
 | --- | --- | --- |
 | [unity-urp-shader-lab](https://github.com/Frenil-client/unity-urp-shader-lab) | 렌더링 / 셰이더 | URP 기반 서브컬쳐(애니메이션) 스타일 NPR 렌더링 랩. Shader Graph 없이 HLSL 직접 작성 — 셀 셰이딩·SDF 페이스 셰도우·헤어 이방성·아웃라인 구현 + SDF/스무딩 노멀 베이커 등 NPR 아트 파이프라인 툴 직접 설계 |
+| [unity-spine-fx-lab](https://github.com/Frenil-client/unity-spine-fx-lab) | 렌더링 / 런타임 시스템 | Unity 6 URP 2D 기반 Spine 2D 런타임 + 셰이더 제어 시스템 랩. Shader Graph 없이 HLSL 직접 작성 — 디졸브·히트플래시·상태이상·아웃라인을 MaterialPropertyBlock 으로 일원 제어(머티리얼 증식 없이). 다중 인스턴스 성능(오프스크린 컬링 58→129 FPS)·통합 투명 고스팅(RT 평탄화) 두 실무 문제를 원인 분석→해결→증거로 정리 |
 | [minigames](https://github.com/Frenil-client/minigames) | 게임플레이 / 아키텍처 | 미니게임 플랫폼. 허브 씬에서 게임을 Additive 로드/언로드하는 확장형 구조 — IMiniGame 생명주기 계약, ScriptableObject 데이터 드리븐 게임 등록, 타워 디펜스·타이밍 게임 2종 구현 |
 | [unity-maplightdata-tool](https://github.com/Frenil-client/unity-maplightdata-tool) | 렌더링 / 에디터 툴 | 씬별 조명 환경을 ScriptableObject로 관리. Primary/Additive 스택 기반 자동 복원, Addressables 에디터 자동화 포함 |
 | [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 시스템 설계 | 제네릭 기반 RPG 스탯 시스템. StatId enum, Reflection 캐싱, MaxValue 무결성 검사 포함 |
@@ -20,4 +21,4 @@ Unity / C# 기반 클라이언트 프로그래머입니다.
 
 ## 기술 스택
 
-`Unity` `C#` `URP` `UGUI` `Addressables` `HLSL` `ScriptableObject` `MVVM`
+`Unity` `C#` `URP` `Spine` `UGUI` `Addressables` `HLSL` `ScriptableObject` `MVVM`
