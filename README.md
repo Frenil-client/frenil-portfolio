@@ -120,4 +120,4 @@ CI가 검증하지 못하는 범위를 숨기지 않기 위해 적어 둡니다.
 
 ## 기술 스택
 
-`Unity` `C#` `UGUI` `NGUI` `MVVM` `ScriptableObject` `Addressables` `Protobuf` `URP` `HLSL` `Spine` `UniTask` `DOTween` `IL2CPP` `GitHub Actions`
+`Unity` `C#` `UGUI` `NGUI` `MVVM` `ScriptableObject` `Addressables` `Protobuf` `URP` `HLSL` `Spine` `UniTask` `DOTween` `GitHub Actions`
