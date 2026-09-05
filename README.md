@@ -36,6 +36,34 @@ Canvas도 GameObject도 만들지 않는 테스트 **21종**이 로비의 흐름
 
 ---
 
+## UI 시스템
+
+### [unity-ui-system](https://github.com/Frenil-client/unity-ui-system)
+
+Unity 6(uGUI) 기준으로 다시 쓴 UI 스택 관리 시스템입니다. 레이어 캔버스, 정렬 순서 자동 배정,
+씬 소유권 기반 수명 관리를 한 덩어리로 묶어 게임 코드가
+`UIManager.Instance.OpenAsync<T>()` 한 줄만 알면 되게 했습니다.
+
+실무에서 UI 시스템을 만들 때마다 반복해서 밟았던 지뢰를 **구조로 막는 것**에 목표를 뒀습니다.
+
+- **정렬 순서를 손으로 매기지 않습니다.** 레이어마다 커서를 두고 뷰가 가진 캔버스 수만큼 연속 구간을
+  예약했다가 닫힐 때 반납합니다. `sortingOrder`를 프리팹에 박아 두고 나중에 겹치는 사고가 사라집니다.
+- **레이어를 타입이 고정합니다.** `UIWindow`/`UIPopup`/`UIToast`가 자기 레이어와 Dim 사용 여부를
+  `sealed override`로 못 박아, 프리팹마다 레이어를 잘못 찍는 실수가 애초에 불가능합니다.
+- **영속 매니저가 씬을 붙잡지 않습니다.** 뷰마다 소유 씬을 기록하고 `sceneUnloaded`에서 스택과
+  정렬 구간을 회수합니다. 씬보다 오래 사는 매니저에서 이 훅이 유일한 누수 방어선입니다.
+- **부트스트랩 씬을 강제하지 않습니다.** 작업하던 씬에서 Play를 눌러도 영속 영역이 서기 때문에
+  "초기화 씬부터 돌려야 UI가 뜬다"는 제약 없이 이터레이션이 끊기지 않습니다.
+
+`UIScreen`만 `UIRoot`로 옮기지 않고 씬에 남긴 이유처럼(옮기면 루트 캔버스가 서브캔버스로 강등되면서
+드리븐 RectTransform이 풀리고 자기 `CanvasScaler`가 죽습니다) **결정마다 근거와 그 대가를** README에
+적었고, 아직 비어 있는 곳(테스트, 무결성 검사 툴, 토스트 자동 소멸)도 같은 자리에 그대로 두었습니다.
+
+뼈대를 세운 단계입니다. 아래 패키지들과 달리 아직 UPM 패키지도 CI도 없고, 실제로 굴려 보며 드러나는
+문제를 하나씩 개선하는 중입니다.
+
+---
+
 ## 재사용 패키지 (UPM)
 
 실무에서 설계했던 구조를 범용 모듈로 다시 구현했습니다. 셋 다 git URL로 설치되고,
@@ -109,12 +137,14 @@ CI가 검증하지 못하는 범위를 숨기지 않기 위해 적어 둡니다.
 
 ---
 
-## 성능 최적화 사례
+## 셰이더와 렌더링
+
+Shader Graph 없이 HLSL을 직접 쓰고, 셰이더를 코드와 데이터로 제어하는 랩 두 개입니다.
 
 | 프로젝트 | 설명 |
 |---|---|
 | [unity-spine-fx-lab](https://github.com/Frenil-client/unity-spine-fx-lab) | Spine 2D 런타임과 셰이더 제어. 디졸브, 히트플래시, 상태이상, 아웃라인을 MaterialPropertyBlock으로 머티리얼 증식 없이 일원 제어. **다중 인스턴스 58 -> 129 FPS**와 통합 투명 고스팅 두 건을 원인 분석부터 해결과 계측까지 정리. 오프스크린 컬링 기반 개선 포함 |
-| [unity-urp-shader-lab](https://github.com/Frenil-client/unity-urp-shader-lab) | URP 기반 NPR 렌더링 랩. Shader Graph 없이 HLSL 직접 작성. 셀 셰이딩, SDF 페이스 셰도우, 헤어 이방성, 아웃라인. SDF/스무딩 노멀 베이커 등 아트 파이프라인 툴 6종 자작 |
+| [unity-urp-shader-lab](https://github.com/Frenil-client/unity-urp-shader-lab) | URP 기반 NPR 렌더링 랩. 셀 셰이딩, SDF 페이스 셰도우, 헤어 이방성, 아웃라인을 HLSL로 구현. SDF/스무딩 노멀 베이커 등 아트 파이프라인 툴 6종 자작 |
 
 ---
 
