@@ -36,63 +36,52 @@ Canvas도 GameObject도 만들지 않는 테스트 **21종**이 로비의 흐름
 
 ---
 
-## UI 시스템
+## 재사용 패키지 (UPM)
 
-### [unity-ui-system](https://github.com/Frenil-client/unity-ui-system)
+실무에서 설계했던 구조를 범용 모듈로 다시 구현했습니다. 넷 다 git URL로 설치됩니다.
+가장 최근에 만든 UI 스택은 v0.1.0을 막 잘라 낸 단계이고, 나머지 셋은 **Unity 라이선스 없이 도는 CI**가
+매 푸시마다 컴파일, 테스트, 할당 회귀를 검증합니다.
 
-Unity 6(uGUI) 기준으로 다시 쓴 UI 스택 관리 시스템입니다. 레이어 캔버스, 정렬 순서 자동 배정,
-씬 소유권 기반 수명 관리를 한 덩어리로 묶어 게임 코드가
-`UIManager.Instance.OpenAsync<T>()` 한 줄만 알면 되게 했습니다.
+| 프로젝트 | 설명 | 테스트 | CI |
+|---|---|---|---|
+| [unity-ui-system](https://github.com/Frenil-client/unity-ui-system) | uGUI UI 스택. 레이어 캔버스와 **정렬 순서 자동 배정**, 씬 소유권 기반 수명 관리를 묶어 게임 코드가 `OpenAsync<T>()` 한 줄만 알면 되게 함 | 0 | 없음 |
+| [unity-mvvm](https://github.com/Frenil-client/unity-mvvm) | UGUI용 경량 MVVM. 외부 라이브러리 없이 `Observable<T>` 값 바인딩과 `ObservableList<T>` **델타 기반 목록 바인딩**. ViewModel은 Unity 비의존이라 화면 없이 테스트되고, 구독 수명은 베이스가 관리 | 38 | ![CI](https://github.com/Frenil-client/unity-mvvm/actions/workflows/ci.yml/badge.svg) |
+| [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 캐릭터 스탯 시스템. long 고정소수점 값 타입으로 결정적 연산, **기본값 + 모디파이어(장비/버프) 2층 구조**, 최종값 캐싱과 변경 통지 | 63 | ![CI](https://github.com/Frenil-client/unity-stat-system/actions/workflows/ci.yml/badge.svg) |
+| [unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system) | 트리 기반 레드닷. enum 숫자 규칙에서 계층 자동 유도, 델타 전파로 읽기 O(1), **트리 디버거 EditorWindow** 포함 | 47 | ![CI](https://github.com/Frenil-client/unity-reddot-system/actions/workflows/ci.yml/badge.svg) |
 
-실무에서 UI 시스템을 만들 때마다 반복해서 밟았던 지뢰를 **구조로 막는 것**에 목표를 뒀습니다.
+### UI 스택 시스템
 
-- **정렬 순서를 손으로 매기지 않습니다.** 레이어마다 커서를 두고 뷰가 가진 캔버스 수만큼 연속 구간을
-  예약했다가 닫힐 때 반납합니다. `sortingOrder`를 프리팹에 박아 두고 나중에 겹치는 사고가 사라집니다.
+실무에서 UI 시스템을 만들 때마다 반복해서 밟았던 것들을 **구조로 막는 데** 목표를 뒀습니다.
+
+- **정렬 순서를 손으로 매기지 않습니다.** 레이어마다 커서를 두고 뷰가 가진 캔버스 수만큼 구간을
+  예약했다가 닫힐 때 반납합니다. `sortingOrder`를 프리팹에 박아 두고 나중에 겹치는 사고가 없습니다.
 - **레이어를 타입이 고정합니다.** `UIWindow`/`UIPopup`/`UIToast`가 자기 레이어와 Dim 사용 여부를
   `sealed override`로 못 박아, 프리팹마다 레이어를 잘못 찍는 실수가 애초에 불가능합니다.
 - **영속 매니저가 씬을 붙잡지 않습니다.** 뷰마다 소유 씬을 기록하고 `sceneUnloaded`에서 스택과
   정렬 구간을 회수합니다. 씬보다 오래 사는 매니저에서 이 훅이 유일한 누수 방어선입니다.
 - **부트스트랩 씬을 강제하지 않습니다.** 작업하던 씬에서 Play를 눌러도 영속 영역이 서기 때문에
-  "초기화 씬부터 돌려야 UI가 뜬다"는 제약 없이 이터레이션이 끊기지 않습니다.
+  "초기화 씬부터 돌려야 UI가 뜬다"는 제약이 없습니다.
 
-`UIScreen`만 `UIRoot`로 옮기지 않고 씬에 남긴 이유처럼(옮기면 루트 캔버스가 서브캔버스로 강등되면서
-드리븐 RectTransform이 풀리고 자기 `CanvasScaler`가 죽습니다) **결정마다 근거와 그 대가를** README에
-적었고, 아직 비어 있는 곳(테스트, 무결성 검사 툴, 토스트 자동 소멸)도 같은 자리에 그대로 두었습니다.
+`UIScreen`만 씬에 남긴 이유처럼 결정마다 근거와 그 대가를 README에 적었고, 아직 비어 있는 곳도
+같은 자리에 그대로 두었습니다.
 
-뼈대를 세운 단계입니다. v0.1.0 을 UPM 패키지로 잘라 냈고, 아래 패키지들과 달리 아직 CI 는 없습니다.
+### UI 스택을 자기 게임에 넣고 드러난 것
 
-### 실제로 굴리고 있습니다
+개인 게임 프로젝트 [DefenceGame](https://github.com/Frenil-client/DefenceGame)에 git URL로 설치해,
+게임이 갖고 있던 UI 매니저를 걷어내고 이 패키지로 교체했습니다. 문자열 id로 팝업을 열던
+`Open("ShopPopup") as ShopPopup`이 `OpenAsync<ShopPopup>()`으로 바뀌면서 오타가 런타임 로그가 아니라
+컴파일 에러가 됐고, 팝업마다 깔던 반투명 backdrop은 공유 Dim 하나로 대체됐습니다.
 
-개인 게임 프로젝트 [DefenceGame](https://github.com/Frenil-client/DefenceGame) 에 git URL 로 설치해,
-게임이 갖고 있던 UI 매니저를 걷어내고 이 패키지로 교체했습니다.
-문자열 id 로 팝업을 열던 `Open("ShopPopup") as ShopPopup` 이 `OpenAsync<ShopPopup>()` 로 바뀌면서
-오타가 런타임 로그가 아니라 컴파일 에러가 됐고, 팝업마다 깔던 반투명 backdrop 은 공유 Dim 하나로
-대체돼 팝업이 겹쳐도 배경이 짙어지지 않습니다. 씬의 HUD 와 팝업이 같은 스택에 들어간 덕에
-"결과창을 띄우기 전에 열려 있던 팝업만 정리" 같은 처리도 타입 인자 한 줄로 끝납니다.
+그 과정에서 드러난 API 마찰 세 건입니다. 셋 다 게임 쪽에서 우회했고 패키지는 아직 손대지 않았습니다.
 
-조립하면서 드러난 마찰도 적어 둡니다. 셋 다 게임 쪽에서 우회했고 패키지는 아직 손대지 않았습니다.
-
-- `UIBase.Close(reason = Dismissed)` 는 선택 인자가 있어 UnityEvent 에 직접 물리지 않습니다.
+- `UIBase.Close(reason = Dismissed)`는 선택 인자가 있어 UnityEvent에 직접 물리지 않습니다.
   닫기 버튼을 붙이려면 뷰마다 인자 없는 래퍼가 하나씩 필요합니다
-- 인자 없는 `CloseAllAsync()` 는 스택 바닥의 `UIScreen` 까지 닫습니다. 팝업만 정리하려던 자리에서
-  HUD 가 통째로 사라져서, 타입을 지정하는 `CloseAllAsync<UIPopup>()` 를 써야 했습니다
-- `UILayerSettings` 의 기본 레퍼런스 해상도가 세로(1080x1920)라 가로 게임에서는 반드시 덮어써야 합니다.
-  씬에 남는 `UIScreen` 은 자기 `CanvasScaler` 를 쓰기 때문에 이 값이 어긋나면 HUD 와 팝업의 배율이 갈라집니다
+- 인자 없는 `CloseAllAsync()`는 스택 바닥의 `UIScreen`까지 닫습니다. 팝업만 정리하려던 자리에서
+  HUD가 통째로 사라져서 `CloseAllAsync<UIPopup>()`를 써야 했습니다
+- `UILayerSettings`의 기본 레퍼런스 해상도가 세로(1080x1920)라 가로 게임에서는 반드시 덮어써야 합니다.
+  씬에 남는 `UIScreen`은 자기 `CanvasScaler`를 쓰기 때문에 어긋나면 HUD와 팝업의 배율이 갈라집니다
 
-다음 버전에서 손볼 순서가 이 셋이고, 그 앞에 테스트와 CI 가 있습니다.
-
----
-
-## 재사용 패키지 (UPM)
-
-실무에서 설계했던 구조를 범용 모듈로 다시 구현했습니다. 셋 다 git URL로 설치되고,
-**Unity 라이선스 없이 도는 CI**가 매 푸시마다 컴파일, 테스트, 할당 회귀를 검증합니다.
-
-| 프로젝트 | 설명 | 테스트 | CI |
-|---|---|---|---|
-| [unity-mvvm](https://github.com/Frenil-client/unity-mvvm) | UGUI용 경량 MVVM. 외부 라이브러리 없이 `Observable<T>` 값 바인딩과 `ObservableList<T>` **델타 기반 목록 바인딩**. ViewModel은 Unity 비의존이라 화면 없이 테스트되고, 구독 수명은 베이스가 관리 | 38 | ![CI](https://github.com/Frenil-client/unity-mvvm/actions/workflows/ci.yml/badge.svg) |
-| [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 캐릭터 스탯 시스템. long 고정소수점 값 타입으로 결정적 연산, **기본값 + 모디파이어(장비/버프) 2층 구조**, 최종값 캐싱과 변경 통지 | 63 | ![CI](https://github.com/Frenil-client/unity-stat-system/actions/workflows/ci.yml/badge.svg) |
-| [unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system) | 트리 기반 레드닷. enum 숫자 규칙에서 계층 자동 유도, 델타 전파로 읽기 O(1), **트리 디버거 EditorWindow** 포함 | 47 | ![CI](https://github.com/Frenil-client/unity-reddot-system/actions/workflows/ci.yml/badge.svg) |
+다음 버전에서 손볼 순서가 이 셋이고, 그 앞에 테스트와 CI가 있습니다.
 
 ### 수치로 남긴 것
 
@@ -123,7 +112,7 @@ GitHub 러너에서 활성화되지 않습니다. 자체 호스팅 러너는 공
 
 그래서 "CI에서 Unity를 돌린다"를 포기하는 대신 **테스트를 Unity 없이 돌 수 있게** 만들었습니다.
 `Tests~/`의 dotnet 프로젝트가 `Tests/`의 소스를 **그대로 컴파일**하므로 사본이 아니라 같은 테스트이고,
-패키지 세 개의 테스트 148종 중 **124종이 CI에서 실행**됩니다. 초록 뱃지가 실제로 무언가를 증명합니다.
+CI가 도는 패키지 세 개의 테스트 148종 중 **124종이 CI에서 실행**됩니다. 초록 뱃지가 실제로 무언가를 증명합니다.
 
 빠지는 24종은 성격이 분명합니다. 할당을 재는 9종은 판정자(`Is.Not.AllocatingGCMemory`)가
 `UnityEngine.TestTools` 소속이고, 나머지 15종은 실제로 `GameObject`를 만들어 View를 붙입니다.
@@ -183,8 +172,7 @@ SD 서브컬처 랜덤 조합 디펜스 로그라이트. 기획부터 코어 아
   netstandard 빌드로 이중 차단하고, dotnet 테스트 41종과 CSV 불변식 린터가 우분투 러너에서 그대로 돕니다.
 - **데이터 드리븐.** 유닛, 조합식, 웨이브, 보스, 스킬을 전부 `Data/*.csv`에 두고 수치를 코드에 박지 않습니다.
 - **자기 패키지를 자기 게임이 씁니다.** UI 스택은 게임 코드에 두지 않고 위 unity-ui-system을
-  UPM으로 설치해 씁니다. 게임이 갖고 있던 UI 매니저를 걷어내고 교체하는 과정에서 패키지 API의
-  마찰 세 건이 드러났고, 목록은 위 UI 시스템 절에 적어 두었습니다.
+  UPM으로 설치해 씁니다. 교체하면서 드러난 API 마찰은 위 패키지 절에 적어 두었습니다.
 - **되돌린 결정을 숨기지 않음.** 전투를 시뮬에서 실시간으로 들어낸 책임 경계 재설계,
   덱 시스템 폐기, 랜덤성을 확률이 아닌 재화(선택권)로 통제한 선택 등 근거와 함께 정리했습니다.
 
