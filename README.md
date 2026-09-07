@@ -38,13 +38,13 @@ Canvas도 GameObject도 만들지 않는 테스트 **21종**이 로비의 흐름
 
 ## 재사용 패키지 (UPM)
 
-실무에서 설계했던 구조를 범용 모듈로 다시 구현했습니다. 넷 다 git URL로 설치됩니다.
-가장 최근에 만든 UI 스택은 v0.1.0을 막 잘라 낸 단계이고, 나머지 셋은 **Unity 라이선스 없이 도는 CI**가
-매 푸시마다 컴파일, 테스트, 할당 회귀를 검증합니다.
+실무에서 설계했던 구조를 범용 모듈로 다시 구현했습니다. 넷 다 git URL로 설치되고,
+**Unity 라이선스 없이 도는 CI**가 매 푸시마다 돕니다. 셋은 컴파일과 테스트, 할당 회귀를 재고,
+가장 최근에 만든 UI 스택은 아직 테스트가 없어 패키지 정합성을 대신 검사합니다.
 
 | 프로젝트 | 설명 | 테스트 | CI |
 |---|---|---|---|
-| [unity-ui-system](https://github.com/Frenil-client/unity-ui-system) | uGUI UI 스택. 레이어 캔버스와 **정렬 순서 자동 배정**, 씬 소유권 기반 수명 관리를 묶어 게임 코드가 `OpenAsync<T>()` 한 줄만 알면 되게 함 | 0 | 없음 |
+| [unity-ui-system](https://github.com/Frenil-client/unity-ui-system) | uGUI UI 스택. 레이어 캔버스와 **정렬 순서 자동 배정**, 씬 소유권 기반 수명 관리를 묶어 게임 코드가 `OpenAsync<T>()` 한 줄만 알면 되게 함 | 0 | ![Validate](https://github.com/Frenil-client/unity-ui-system/actions/workflows/validate.yml/badge.svg) |
 | [unity-mvvm](https://github.com/Frenil-client/unity-mvvm) | UGUI용 경량 MVVM. 외부 라이브러리 없이 `Observable<T>` 값 바인딩과 `ObservableList<T>` **델타 기반 목록 바인딩**. ViewModel은 Unity 비의존이라 화면 없이 테스트되고, 구독 수명은 베이스가 관리 | 38 | ![CI](https://github.com/Frenil-client/unity-mvvm/actions/workflows/ci.yml/badge.svg) |
 | [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 캐릭터 스탯 시스템. long 고정소수점 값 타입으로 결정적 연산, **기본값 + 모디파이어(장비/버프) 2층 구조**, 최종값 캐싱과 변경 통지 | 63 | ![CI](https://github.com/Frenil-client/unity-stat-system/actions/workflows/ci.yml/badge.svg) |
 | [unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system) | 트리 기반 레드닷. enum 숫자 규칙에서 계층 자동 유도, 델타 전파로 읽기 O(1), **트리 디버거 EditorWindow** 포함 | 47 | ![CI](https://github.com/Frenil-client/unity-reddot-system/actions/workflows/ci.yml/badge.svg) |
@@ -72,16 +72,18 @@ Canvas도 GameObject도 만들지 않는 테스트 **21종**이 로비의 흐름
 `Open("ShopPopup") as ShopPopup`이 `OpenAsync<ShopPopup>()`으로 바뀌면서 오타가 런타임 로그가 아니라
 컴파일 에러가 됐고, 팝업마다 깔던 반투명 backdrop은 공유 Dim 하나로 대체됐습니다.
 
-그 과정에서 드러난 API 마찰 세 건입니다. 셋 다 게임 쪽에서 우회했고 패키지는 아직 손대지 않았습니다.
+그 과정에서 API 마찰 세 건이 드러났고, **둘은 게임이 아니라 패키지를 고쳐** 해결했습니다.
 
-- `UIBase.Close(reason = Dismissed)`는 선택 인자가 있어 UnityEvent에 직접 물리지 않습니다.
-  닫기 버튼을 붙이려면 뷰마다 인자 없는 래퍼가 하나씩 필요합니다
-- 인자 없는 `CloseAllAsync()`는 스택 바닥의 `UIScreen`까지 닫습니다. 팝업만 정리하려던 자리에서
-  HUD가 통째로 사라져서 `CloseAllAsync<UIPopup>()`를 써야 했습니다
-- `UILayerSettings`의 기본 레퍼런스 해상도가 세로(1080x1920)라 가로 게임에서는 반드시 덮어써야 합니다.
-  씬에 남는 `UIScreen`은 자기 `CanvasScaler`를 쓰기 때문에 어긋나면 HUD와 팝업의 배율이 갈라집니다
+- `Close(reason = Dismissed)`는 선택 인자 때문에 인스펙터의 UnityEvent 목록에 오르지 않아,
+  닫기 버튼마다 뷰에 인자 없는 래퍼가 필요했습니다. 기본값을 걷어내고 `Close()`, `CloseConfirmed()`,
+  `CloseCancelled()`를 베이스에 두는 것으로 고쳤습니다
+- 인자 없는 `CloseAllAsync()`가 스택 바닥의 `UIScreen`까지 닫아, 팝업만 정리하려던 자리에서 HUD가
+  통째로 사라졌습니다. 화면을 남기도록 고쳤습니다. 화면까지 걷어내는 것은 씬 언로드와 `Reset()`의 일입니다
+- `UILayerSettings`의 기본 레퍼런스 해상도가 세로(1080x1920)라 가로 게임은 반드시 덮어써야 합니다.
+  이건 아직 게임 쪽에서 덮어쓰고 있습니다
 
-다음 버전에서 손볼 순서가 이 셋이고, 그 앞에 테스트와 CI가 있습니다.
+쓰는 쪽에 서 보기 전에는 보이지 않던 것들이라, 이 이식이 패키지 API를 가장 크게 움직였습니다.
+남은 하나와 테스트가 다음 순서이고, 순서는 저장소 README의 "다음에 할 것"에 적어 두었습니다.
 
 ### 수치로 남긴 것
 
@@ -112,12 +114,16 @@ GitHub 러너에서 활성화되지 않습니다. 자체 호스팅 러너는 공
 
 그래서 "CI에서 Unity를 돌린다"를 포기하는 대신 **테스트를 Unity 없이 돌 수 있게** 만들었습니다.
 `Tests~/`의 dotnet 프로젝트가 `Tests/`의 소스를 **그대로 컴파일**하므로 사본이 아니라 같은 테스트이고,
-CI가 도는 패키지 세 개의 테스트 148종 중 **124종이 CI에서 실행**됩니다. 초록 뱃지가 실제로 무언가를 증명합니다.
+테스트가 있는 세 패키지의 148종 중 **124종이 CI에서 실행**됩니다. 초록 뱃지가 실제로 무언가를 증명합니다.
 
 빠지는 24종은 성격이 분명합니다. 할당을 재는 9종은 판정자(`Is.Not.AllocatingGCMemory`)가
 `UnityEngine.TestTools` 소속이고, 나머지 15종은 실제로 `GameObject`를 만들어 View를 붙입니다.
 둘 다 Unity 없이는 의미가 없어서 Test Runner에 남겼습니다.
 CI가 검증하지 못하는 범위를 숨기지 않기 위해 적어 둡니다.
+
+UI 스택은 아직 테스트가 없어 같은 무라이선스 원칙을 다른 데 씁니다. 패키지 경계에 씬이나 샘플이
+섞였는지, `.meta` 짝이 맞는지, 태그와 `package.json` 버전이 어긋나지 않는지를 봅니다.
+클론한 상태에서만 드러나는 짝 잃은 `.meta`가 실제로 여기서 잡혔습니다.
 
 ---
 
