@@ -29,25 +29,23 @@ silsen@naver.com
 Canvas도 GameObject도 만들지 않는 테스트 **21종**이 로비의 흐름 전체를 검증합니다.
 `mvvm`이 ViewModel을 MonoBehaviour로 만들지 않은 이유가 여기서 증명됩니다.
 
-패키지를 실제로 조립하는 과정에서 **패키지 쪽 결함 세 건**이 드러났고, 셋 다 데모가 아니라 패키지를
-고쳐 해결했습니다. git URL 설치에서만 터지는 `.meta` 누락, 씬 오브젝트 순서에 따라 죽는 초기화 의존,
-목록 항목 View가 프레임워크 기본 경로를 못 쓰던 문제입니다. 원인과 해결은
-[데모 README](https://github.com/Frenil-client/unity-integration-demo#이-데모가-드러낸-것)에 정리했습니다.
+이 데모는 세 패키지의 **통합 테스트를 겸합니다.** 실제로 조립해 봐야 드러나는 것들이 있어서,
+여기서 나온 수정은 전부 데모가 아니라 패키지 쪽에 반영했습니다. 무엇이 왜 바뀌었는지는
+[데모 README](https://github.com/Frenil-client/unity-integration-demo#이-데모가-드러낸-것)에 있습니다.
 
 ---
 
 ## 재사용 패키지 (UPM)
 
 실무에서 설계했던 구조를 범용 모듈로 다시 구현했습니다. 넷 다 git URL로 설치되고,
-**Unity 라이선스 없이 도는 CI**가 매 푸시마다 돕니다. 셋은 컴파일과 테스트, 할당 회귀를 재고,
-가장 최근에 만든 UI 스택은 아직 테스트가 없어 패키지 정합성을 대신 검사합니다.
+**Unity 라이선스 없이 도는 CI**가 매 푸시마다 컴파일, 테스트, 할당 회귀, 패키지 정합성을 검사합니다.
 
-| 프로젝트 | 설명 | 테스트 | CI |
-|---|---|---|---|
-| [unity-ui-system](https://github.com/Frenil-client/unity-ui-system) | uGUI UI 스택. 레이어 캔버스와 **정렬 순서 자동 배정**, 씬 소유권 기반 수명 관리를 묶어 게임 코드가 `OpenAsync<T>()` 한 줄만 알면 되게 함 | 0 | ![Validate](https://github.com/Frenil-client/unity-ui-system/actions/workflows/validate.yml/badge.svg) |
-| [unity-mvvm](https://github.com/Frenil-client/unity-mvvm) | UGUI용 경량 MVVM. 외부 라이브러리 없이 `Observable<T>` 값 바인딩과 `ObservableList<T>` **델타 기반 목록 바인딩**. ViewModel은 Unity 비의존이라 화면 없이 테스트되고, 구독 수명은 베이스가 관리 | 38 | ![CI](https://github.com/Frenil-client/unity-mvvm/actions/workflows/ci.yml/badge.svg) |
-| [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 캐릭터 스탯 시스템. long 고정소수점 값 타입으로 결정적 연산, **기본값 + 모디파이어(장비/버프) 2층 구조**, 최종값 캐싱과 변경 통지 | 63 | ![CI](https://github.com/Frenil-client/unity-stat-system/actions/workflows/ci.yml/badge.svg) |
-| [unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system) | 트리 기반 레드닷. enum 숫자 규칙에서 계층 자동 유도, 델타 전파로 읽기 O(1), **트리 디버거 EditorWindow** 포함 | 47 | ![CI](https://github.com/Frenil-client/unity-reddot-system/actions/workflows/ci.yml/badge.svg) |
+| 프로젝트 | 설명 | CI |
+|---|---|---|
+| [unity-ui-system](https://github.com/Frenil-client/unity-ui-system) | uGUI UI 스택. 레이어 캔버스와 **정렬 순서 자동 배정**, 씬 소유권 기반 수명 관리를 묶어 게임 코드가 `OpenAsync<T>()` 한 줄만 알면 되게 함 | ![Validate](https://github.com/Frenil-client/unity-ui-system/actions/workflows/validate.yml/badge.svg) |
+| [unity-mvvm](https://github.com/Frenil-client/unity-mvvm) | UGUI용 경량 MVVM. 외부 라이브러리 없이 `Observable<T>` 값 바인딩과 `ObservableList<T>` **델타 기반 목록 바인딩**. ViewModel은 Unity 비의존이라 화면 없이 테스트되고, 구독 수명은 베이스가 관리. **EditMode 테스트 38종** | ![CI](https://github.com/Frenil-client/unity-mvvm/actions/workflows/ci.yml/badge.svg) |
+| [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 캐릭터 스탯 시스템. long 고정소수점 값 타입으로 결정적 연산, **기본값 + 모디파이어(장비/버프) 2층 구조**, 최종값 캐싱과 변경 통지. **EditMode 테스트 63종** | ![CI](https://github.com/Frenil-client/unity-stat-system/actions/workflows/ci.yml/badge.svg) |
+| [unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system) | 트리 기반 레드닷. enum 숫자 규칙에서 계층 자동 유도, 델타 전파로 읽기 O(1), **트리 디버거 EditorWindow** 포함. **EditMode 테스트 47종** | ![CI](https://github.com/Frenil-client/unity-reddot-system/actions/workflows/ci.yml/badge.svg) |
 
 ### UI 스택 시스템
 
@@ -62,49 +60,31 @@ Canvas도 GameObject도 만들지 않는 테스트 **21종**이 로비의 흐름
 - **부트스트랩 씬을 강제하지 않습니다.** 작업하던 씬에서 Play를 눌러도 영속 영역이 서기 때문에
   "초기화 씬부터 돌려야 UI가 뜬다"는 제약이 없습니다.
 
-`UIScreen`만 씬에 남긴 이유처럼 결정마다 근거와 그 대가를 README에 적었고, 아직 비어 있는 곳도
-같은 자리에 그대로 두었습니다.
+`UIScreen`만 씬에 남긴 이유처럼 결정마다 근거와 그 대가를
+[저장소 README](https://github.com/Frenil-client/unity-ui-system)에 적었습니다.
 
-### UI 스택을 자기 게임에 넣고 드러난 것
+### 자기 게임이 이 패키지의 사용자입니다
 
-개인 게임 프로젝트 [DefenceGame](https://github.com/Frenil-client/DefenceGame)에 git URL로 설치해,
-게임이 갖고 있던 UI 매니저를 걷어내고 이 패키지로 교체했습니다. 문자열 id로 팝업을 열던
-`Open("ShopPopup") as ShopPopup`이 `OpenAsync<ShopPopup>()`으로 바뀌면서 오타가 런타임 로그가 아니라
-컴파일 에러가 됐고, 팝업마다 깔던 반투명 backdrop은 공유 Dim 하나로 대체됐습니다.
+개인 게임 프로젝트 [DefenceGame](https://github.com/Frenil-client/DefenceGame)이 이 패키지를
+git URL로 설치해 씁니다. 게임 코드 쪽에는 UI 매니저가 없습니다.
 
-그 과정에서 API 마찰 세 건이 드러났고, **둘은 게임이 아니라 패키지를 고쳐** 해결했습니다.
+문자열 id로 팝업을 열던 `Open("ShopPopup") as ShopPopup`이 `OpenAsync<ShopPopup>()`으로 바뀌면서
+오타가 런타임 로그가 아니라 컴파일 에러가 됐고, 팝업마다 깔던 반투명 backdrop은 공유 Dim 하나로
+대체됐습니다. 쓰는 쪽에 서 보고서야 보이는 것들이 API를 움직여서, 인스펙터에 그대로 물릴 수 있는
+무인자 닫기 진입점과 `UIScreen`을 남기는 `CloseAllAsync()`가 이 이식에서 나왔습니다.
 
-- `Close(reason = Dismissed)`는 선택 인자 때문에 인스펙터의 UnityEvent 목록에 오르지 않아,
-  닫기 버튼마다 뷰에 인자 없는 래퍼가 필요했습니다. 기본값을 걷어내고 `Close()`, `CloseConfirmed()`,
-  `CloseCancelled()`를 베이스에 두는 것으로 고쳤습니다
-- 인자 없는 `CloseAllAsync()`가 스택 바닥의 `UIScreen`까지 닫아, 팝업만 정리하려던 자리에서 HUD가
-  통째로 사라졌습니다. 화면을 남기도록 고쳤습니다. 화면까지 걷어내는 것은 씬 언로드와 `Reset()`의 일입니다
-- `UILayerSettings`의 기본 레퍼런스 해상도가 세로(1080x1920)라 가로 게임은 반드시 덮어써야 합니다.
-  이건 아직 게임 쪽에서 덮어쓰고 있습니다
+### 기계가 지키고 있는 것
 
-쓰는 쪽에 서 보기 전에는 보이지 않던 것들이라, 이 이식이 패키지 API를 가장 크게 움직였습니다.
-남은 하나와 테스트가 다음 순서이고, 순서는 저장소 README의 "다음에 할 것"에 적어 두었습니다.
+문서가 아니라 CI가 강제합니다. 뱃지가 초록이면 아래는 지금도 참입니다.
 
-### 수치로 남긴 것
-
-**할당 19.07MB -> 0B** (stat-system)
-
-`FieldInfo.GetValue()`가 struct를 호출마다 boxing하던 경로를 배열 인덱싱으로 재설계했습니다.
-반복당 200바이트가 40바이트 박스 5개와 정확히 일치합니다.
-[벤치마크 코드](https://github.com/Frenil-client/unity-stat-system/tree/main/Benchmarks~)가 리팩토링 전후
-구현을 나란히 돌려 매번 다시 재고, **CI가 0바이트를 강제**하므로 문서가 낡을 수 없습니다.
-Unity가 물결로 끝나는 폴더를 임포트하지 않기 때문에 벤치마크는 패키지 사용자에게 딸려가지 않습니다.
-
-**boxed 열거자 40 B/회** (mvvm)
-
-`ObservableList<T>`가 `List<T>.Enumerator`를 그대로 반환하는 이유를 인터페이스 경유 열거와
-나란히 재서 숫자로 남겼습니다.
-
-**float 대신 long 고정소수점** (stat-system)
-
-부동소수점 결과는 플랫폼과 최적화 옵션에 따라 마지막 자리가 갈립니다. 표시용으로 끝나면 문제가
-없지만 같은 계산을 서로 다른 곳에서 돌려 같은 답이 나와야 하는 순간부터는 재현 불가능한 불일치가
-됩니다. 그래서 모든 산술을 정수 연산으로 닫아, 같은 입력이면 어느 환경에서든 비트 단위로 같습니다.
+- **스탯 일괄 처리가 할당 0바이트로 돈다.** 40만 연산 기준. `StatSlot[]` 밀집 배열과 StatId 인덱스
+  룩업으로 닫아 두었고,
+  [벤치마크](https://github.com/Frenil-client/unity-stat-system/tree/main/Benchmarks~)가 매번 다시 재며
+  **CI가 0바이트를 강제**하므로 이 문장이 낡을 수 없습니다
+- **모든 스탯 산술이 정수 연산으로 닫혀 있다.** long 고정소수점이라 플랫폼과 최적화 옵션이 달라도
+  같은 입력이면 비트 단위로 같은 답이 나옵니다. 같은 계산을 서로 다른 곳에서 돌려야 할 때 필요한 성질입니다
+- **ViewModel이 UnityEngine을 참조하지 않는다.** 그래서 화면도 GameObject도 없이 테스트되고,
+  그 테스트가 Unity 없는 러너에서 그대로 돕니다
 
 ### CI 구성
 
@@ -114,16 +94,11 @@ GitHub 러너에서 활성화되지 않습니다. 자체 호스팅 러너는 공
 
 그래서 "CI에서 Unity를 돌린다"를 포기하는 대신 **테스트를 Unity 없이 돌 수 있게** 만들었습니다.
 `Tests~/`의 dotnet 프로젝트가 `Tests/`의 소스를 **그대로 컴파일**하므로 사본이 아니라 같은 테스트이고,
-테스트가 있는 세 패키지의 148종 중 **124종이 CI에서 실행**됩니다. 초록 뱃지가 실제로 무언가를 증명합니다.
+**124종이 매 푸시마다 우분투 러너에서** 돕니다. 초록 뱃지가 실제로 무언가를 증명합니다.
 
-빠지는 24종은 성격이 분명합니다. 할당을 재는 9종은 판정자(`Is.Not.AllocatingGCMemory`)가
-`UnityEngine.TestTools` 소속이고, 나머지 15종은 실제로 `GameObject`를 만들어 View를 붙입니다.
-둘 다 Unity 없이는 의미가 없어서 Test Runner에 남겼습니다.
-CI가 검증하지 못하는 범위를 숨기지 않기 위해 적어 둡니다.
-
-UI 스택은 아직 테스트가 없어 같은 무라이선스 원칙을 다른 데 씁니다. 패키지 경계에 씬이나 샘플이
-섞였는지, `.meta` 짝이 맞는지, 태그와 `package.json` 버전이 어긋나지 않는지를 봅니다.
-클론한 상태에서만 드러나는 짝 잃은 `.meta`가 실제로 여기서 잡혔습니다.
+같은 원칙이 UI 스택에서는 패키지 정합성 검사로 갑니다. 경계에 씬이나 샘플이 섞였는지, `.meta` 짝이
+맞는지, 태그와 `package.json` 버전이 어긋나지 않는지를 30초 안에 봅니다. 클론한 상태에서만 드러나는
+짝 잃은 `.meta`가 실제로 여기서 잡혔습니다.
 
 ---
 
@@ -157,7 +132,7 @@ Shader Graph 없이 HLSL을 직접 쓰고, 셰이더를 코드와 데이터로 �
 
 | 프로젝트 | 설명 |
 |---|---|
-| [unity-spine-fx-lab](https://github.com/Frenil-client/unity-spine-fx-lab) | Spine 2D 런타임과 셰이더 제어. 디졸브, 히트플래시, 상태이상, 아웃라인을 MaterialPropertyBlock으로 머티리얼 증식 없이 일원 제어. **다중 인스턴스 58 -> 129 FPS**와 통합 투명 고스팅 두 건을 원인 분석부터 해결과 계측까지 정리. 오프스크린 컬링 기반 개선 포함 |
+| [unity-spine-fx-lab](https://github.com/Frenil-client/unity-spine-fx-lab) | Spine 2D 런타임과 셰이더 제어. 디졸브, 히트플래시, 상태이상, 아웃라인을 MaterialPropertyBlock으로 머티리얼 증식 없이 일원 제어. 오프스크린 컬링으로 **spineboy 300체를 129 FPS로** 굴리고, 다중 파츠를 RT에 평탄화해 통합 투명 연출을 겹침 없이 처리. Profiler 계측과 비교 컷 포함 |
 | [unity-urp-shader-lab](https://github.com/Frenil-client/unity-urp-shader-lab) | URP 기반 NPR 렌더링 랩. 셀 셰이딩, SDF 페이스 셰도우, 헤어 이방성, 아웃라인을 HLSL로 구현. SDF/스무딩 노멀 베이커 등 아트 파이프라인 툴 6종 자작 |
 
 ---
@@ -178,9 +153,9 @@ SD 서브컬처 랜덤 조합 디펜스 로그라이트. 기획부터 코어 아
   netstandard 빌드로 이중 차단하고, dotnet 테스트 41종과 CSV 불변식 린터가 우분투 러너에서 그대로 돕니다.
 - **데이터 드리븐.** 유닛, 조합식, 웨이브, 보스, 스킬을 전부 `Data/*.csv`에 두고 수치를 코드에 박지 않습니다.
 - **자기 패키지를 자기 게임이 씁니다.** UI 스택은 게임 코드에 두지 않고 위 unity-ui-system을
-  UPM으로 설치해 씁니다. 교체하면서 드러난 API 마찰은 위 패키지 절에 적어 두었습니다.
-- **되돌린 결정을 숨기지 않음.** 전투를 시뮬에서 실시간으로 들어낸 책임 경계 재설계,
-  덱 시스템 폐기, 랜덤성을 확률이 아닌 재화(선택권)로 통제한 선택 등 근거와 함께 정리했습니다.
+  UPM으로 설치해 씁니다.
+- **설계 판단을 근거와 함께 남깁니다.** 전투를 시뮬에서 실시간으로 들어낸 책임 경계 재설계,
+  덱 대신 고른 조합 구조, 랜덤성을 확률이 아닌 재화(선택권)로 통제한 선택을 정리했습니다.
 
 아트는 의도적으로 0입니다(로드맵상 재미 판정 전까지 아트 비용을 쓰지 않는 규칙). 그레이박스 상태에서
 코어 아키텍처와 검증 파이프라인, 게임 디자인 판단을 증명하는 데 목적이 있습니다.
