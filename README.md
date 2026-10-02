@@ -84,7 +84,7 @@ CI 구성 기준입니다. 최신 실행 결과는 각 워크플로에서 확인
 
 | 저장소 | 자동 검증 | Unity에서 별도로 확인할 범위 |
 |---|---|---|
-| [UI Validate](https://github.com/Frenil-client/unity-ui-system/actions/workflows/validate.yml) | 패키지 경계·meta·JSON·CHANGELOG 정합성. 릴리스 시 태그·버전 대조 | 컴파일과 UI 동작, 씬 전환·입력·비동기 수명 |
+| [UI Validate](https://github.com/Frenil-client/unity-ui-system/actions/workflows/validate.yml) | 패키지 경계·meta·JSON·CHANGELOG 정합성. 릴리스 시 태그·버전 대조 | EditMode·PlayMode 테스트, 씬 전환·입력·비동기 수명 동작 |
 | [MVVM CI](https://github.com/Frenil-client/unity-mvvm/actions/workflows/ci.yml) | 순수 C# 코어 빌드, 헤드리스 20종, 할당 벤치마크 | View 테스트 15종과 Unity 할당 테스트 3종 |
 | [Stat CI](https://github.com/Frenil-client/unity-stat-system/actions/workflows/ci.yml) | 코어 빌드, 헤드리스 57종, 할당 벤치마크 | Unity 할당 테스트 6종, Mono·IL2CPP 실행 확인 |
 | [RedDot CI](https://github.com/Frenil-client/unity-reddot-system/actions/workflows/ci.yml) | 코어 빌드, 트리·진단 로직 47종 | Icon·Manager·EditorWindow의 Unity 동작 |
