@@ -77,7 +77,6 @@ SRP Batcher 호환을 포기하는 대가와 해당 장면에서의 비교 계�
 
 UI·MVVM·스탯·레드닷은 독립 UPM 패키지입니다. UI는 Unity 6000.3 이상,
 나머지는 각 저장소에 적힌 Unity 최소 버전과 의존성을 따릅니다.
-MapLightData도 UPM으로 설치되며 Addressables를 사용합니다.
 
 ## 검증 범위
 
