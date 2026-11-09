@@ -17,9 +17,24 @@ silsen@naver.com · [GitHub](https://github.com/Frenil-client)
 아래 저장소는 개인 작업물입니다. 실무에서 다룬 문제를 범용 시스템으로 재구현하거나,
 런타임 제어와 렌더링 기법을 별도로 검증한 결과를 공개합니다.
 
-## 먼저 볼 작업 세 가지
+## 먼저 볼 작업 네 가지
 
-### 1. [통합 데모](https://github.com/Frenil-client/unity-integration-demo) - 독립 패키지를 하나의 화면으로 연결
+### 1. [Lobby Flow](https://github.com/Frenil-client/unity-lobby-flow) - Addressables 원격 패치와 리소스 수명
+
+![겨울 v1에서 봄 v2로 콘텐츠 업데이트](docs/images/lobby-flow-update.gif)
+
+로비까지 필요한 리소스는 로컬 그룹에, 시즌 코스튬과 챕터 2, 3은 Unity CCD의 원격 그룹에 둡니다.
+앱을 다시 설치하지 않고 v1(겨울)에서 v2(봄)로 배너와 코스튬을 바꾸며, 시작할 때 카탈로그를 확인해 바뀐 번들만 받습니다.
+캐릭터 미리보기는 요청마다 번호를 붙여 늦게 도착한 결과를 반환하고, 로비와 챕터 1을 30회 왕복해도 보유 리소스와 번들 수가 같습니다.
+
+Jenkins `content-release`가 플랫폼마다 v1 전체 빌드부터 v2 업데이트, CCD 업로드, 공개 주소의 해시와 파일 검증까지 한 번에 처리합니다.
+같은 커밋의 로컬 빌드와 Jenkins 빌드를 비교하며 공통 번들 이름, TMP 셰이더 디버그 정보, 폴더 항목의 의존성 기록 문제를 찾아 고쳤고,
+중복 폰트와 셰이더를 분리해 챕터 2 다운로드를 약 2.9MB에서 21KB로 줄였습니다.
+
+**확인 방법:** Windows와 Unity 6000.3.9f1에서 로컬 콘텐츠 서버로 v1에서 v2로의 패치를 재현합니다. CCD 계정은 필요 없습니다.
+[재현 절차](https://github.com/Frenil-client/unity-lobby-flow#직접-재현하기)
+
+### 2. [통합 데모](https://github.com/Frenil-client/unity-integration-demo) - 독립 패키지를 하나의 화면으로 연결
 
 ![통합 데모 로비](docs/images/demo-lobby.gif)
 
@@ -35,7 +50,7 @@ silsen@naver.com · [GitHub](https://github.com/Frenil-client)
 **확인 방법:** Unity 6000.3.9f1에서 `Assets/Scenes/LobbyDemo.unity` 실행.
 EditMode 테스트 21종이 로비의 흐름을 검증하며, 설치 버전은 manifest의 태그로 고정합니다.
 
-### 2. [UI 스택 시스템](https://github.com/Frenil-client/unity-ui-system) - 게임에서 사용하는 UPM 패키지
+### 3. [UI 스택 시스템](https://github.com/Frenil-client/unity-ui-system) - 게임에서 사용하는 UPM 패키지
 
 레이어 캔버스, 정렬 순서 배정, 공유 Dim, 씬 소유권에 따른 UI 수명을 관리합니다.
 뷰 타입이 레이어를 정하고, 뷰가 가진 캔버스 수만큼 정렬 구간을 예약했다가 닫을 때 반납합니다.
@@ -47,7 +62,7 @@ EditMode 테스트 21종이 로비의 흐름을 검증하며, 설치 버전은 m
 
 **확인 방법:** 패키지 저장소의 `SampleLobby` 씬 또는 DefenceGame의 상점·조합·결과 팝업.
 
-### 3. [Spine FX 랩](https://github.com/Frenil-client/unity-spine-fx-lab) - 성능과 통합 투명 연출
+### 4. [Spine FX 랩](https://github.com/Frenil-client/unity-spine-fx-lab) - 성능과 통합 투명 연출
 
 Spine의 부위별 페이드에서 생기는 겹침을 RT 평탄화와 단일 알파 합성으로 처리하고,
 화면 밖 캐릭터의 애니메이션·메시 갱신 비용을 컬링으로 줄였습니다.
@@ -64,6 +79,7 @@ SRP Batcher 호환을 포기하는 대가와 해당 장면에서의 비교 계�
 
 | 저장소 | 역할 / 확인할 내용 |
 |---|---|
+| [unity-lobby-flow](https://github.com/Frenil-client/unity-lobby-flow) | Addressables 로컬/원격 그룹과 CCD 패치, 미리보기 요청과 리소스 반환, Jenkins 빌드와 업로드 검증, 재사용 배포 패키지 |
 | [unity-integration-demo](https://github.com/Frenil-client/unity-integration-demo) | 세 패키지의 연결, 로비 상태 변화, 구독 해제와 통합 테스트 |
 | [unity-ui-system](https://github.com/Frenil-client/unity-ui-system) | UI 스택·정렬 구간·씬 소유권·풀링, DefenceGame 적용 |
 | [unity-mvvm](https://github.com/Frenil-client/unity-mvvm) | `Observable<T>`와 델타 목록 바인딩, Unity 비의존 ViewModel, View 구독 수명 |
@@ -88,6 +104,10 @@ CI 구성 기준입니다. 최신 실행 결과는 각 워크플로에서 확인
 | [MVVM CI](https://github.com/Frenil-client/unity-mvvm/actions/workflows/ci.yml) | 순수 C# 코어 빌드, 헤드리스 20종, 할당 벤치마크 | View 테스트 15종과 Unity 할당 테스트 3종 |
 | [Stat CI](https://github.com/Frenil-client/unity-stat-system/actions/workflows/ci.yml) | 코어 빌드, 헤드리스 57종, 할당 벤치마크 | Unity 할당 테스트 6종, Mono·IL2CPP 실행 확인 |
 | [RedDot CI](https://github.com/Frenil-client/unity-reddot-system/actions/workflows/ci.yml) | 코어 빌드, 트리·진단 로직 47종 | Icon·Manager·EditorWindow의 Unity 동작 |
+| Lobby Flow (Jenkins) | 무결성 검사, EditMode 45종, PlayMode 13종. 콘텐츠 릴리스에서 v1/v2 빌드, CCD 업로드, 공개 주소의 해시와 파일 크기 검증 | Windows와 Android 실행 화면. iOS는 검증 전 |
+
+Lobby Flow의 Jenkins는 개발 PC에 설치해 실행 결과 페이지가 공개되어 있지 않습니다. 실행 번호별 결과와 CCD 해시는
+[CCD 검증 기록](https://github.com/Frenil-client/unity-lobby-flow/blob/main/docs/records/2026-11-05-ccd-v1-v2.md)에 남겼습니다.
 
 MVVM·Stat·RedDot의 헤드리스 테스트는 합계 124종입니다. `Tests~/`가 `Tests/`의 같은 소스를 컴파일하므로
 사본이 아니라 같은 테스트가 매 푸시마다 우분투 러너에서 돕니다.
@@ -114,4 +134,4 @@ MVVM·Stat·RedDot의 헤드리스 테스트는 합계 124종입니다. `Tests~/
 
 ## 기술 스택
 
-`Unity` `C#` `UGUI` `NGUI` `MVVM` `ScriptableObject` `Addressables` `Protobuf` `URP` `HLSL` `Spine` `UniTask` `DOTween` `GitHub Actions`
+`Unity` `C#` `UGUI` `NGUI` `MVVM` `ScriptableObject` `Addressables` `Unity CCD` `Protobuf` `URP` `HLSL` `Spine` `UniTask` `DOTween` `GitHub Actions` `Jenkins`
