@@ -17,9 +17,28 @@ silsen@naver.com · [GitHub](https://github.com/Frenil-client)
 아래 저장소는 개인 작업물입니다. 실무에서 다룬 문제를 범용 시스템으로 재구현하거나,
 런타임 제어와 렌더링 기법을 별도로 검증한 결과를 공개합니다.
 
-## 먼저 볼 작업 네 가지
+## 먼저 볼 작업 다섯 가지
 
-### 1. [Lobby Flow](https://github.com/Frenil-client/unity-lobby-flow) - Addressables 원격 패치와 리소스 수명
+### 1. [Aim Combat Slice](https://github.com/Frenil-client/unity-aim-combat-slice) - 조준 사격 전투 클라이언트 프로토타입
+
+![보스 등장 연출: WARNING 띠, 붉은 경보 화면, 보스를 비추는 카메라](docs/images/aim-combat-boss-intro.gif)
+
+승리의 여신: 니케의 전투를 레퍼런스로, 엄폐 뒤에서 조준해 쏘는 3인 분대 전투 한 판을 만들었습니다.
+무기 3종(연사, 차지, 산탄), 스킬과 단계형 버스트(I, II, III, 풀 버스트), 상태효과, 보스 부위 파괴와 패턴 저지,
+히트스톱과 피격 플래시 같은 타격감을 넣었고, 캐릭터, 적, 배경, 이름은 모두 자체로 만들었습니다.
+
+피해 계산과 상태효과는 UnityEngine을 참조하지 않는 Core 어셈블리에서 고정소수점과 결정적 난수로 처리합니다.
+스킬은 발동 블록과 효과를 조합한 데이터 에셋이고, 스킬 관리 창이 실행 중 로드와 같은 규칙으로 검증한 뒤 저장합니다.
+두 번째 스킬 세트(9종)는 코드 수정 없이 이 툴과 데이터만으로 추가했습니다.
+
+씬마다 기초 리소스 목록을 두고 다음 씬이 쓰는 리소스만 남겨, 다시 시작할 때 새로 불러오는 리소스가 0개입니다.
+UI 스택, 스탯, Addressables 배포 설정과 Jenkins 템플릿은 앞서 만든 [UI 스택](https://github.com/Frenil-client/unity-ui-system),
+[스탯](https://github.com/Frenil-client/unity-stat-system), [Lobby Flow](https://github.com/Frenil-client/unity-lobby-flow) 패키지를 가져와 썼습니다.
+
+**확인 방법:** 저장소의 [Release](https://github.com/Frenil-client/unity-aim-combat-slice/tree/main/Release) 폴더에 있는 Windows zip 또는 Android APK를 실행합니다.
+에디터에서는 Unity 6000.3.9f1에서 `Assets/Scenes/Boot.unity`를 실행합니다.
+
+### 2. [Lobby Flow](https://github.com/Frenil-client/unity-lobby-flow) - Addressables 원격 패치와 리소스 수명
 
 ![겨울 v1에서 봄 v2로 콘텐츠 업데이트](docs/images/lobby-flow-update.gif)
 
@@ -34,7 +53,7 @@ Jenkins `content-release`가 플랫폼마다 v1 전체 빌드부터 v2 업데이
 **확인 방법:** Windows와 Unity 6000.3.9f1에서 로컬 콘텐츠 서버로 v1에서 v2로의 패치를 재현합니다. CCD 계정은 필요 없습니다.
 [재현 절차](https://github.com/Frenil-client/unity-lobby-flow#직접-재현하기)
 
-### 2. [통합 데모](https://github.com/Frenil-client/unity-integration-demo) - 독립 패키지를 하나의 화면으로 연결
+### 3. [통합 데모](https://github.com/Frenil-client/unity-integration-demo) - 독립 패키지를 하나의 화면으로 연결
 
 ![통합 데모 로비](docs/images/demo-lobby.gif)
 
@@ -50,7 +69,7 @@ Jenkins `content-release`가 플랫폼마다 v1 전체 빌드부터 v2 업데이
 **확인 방법:** Unity 6000.3.9f1에서 `Assets/Scenes/LobbyDemo.unity` 실행.
 EditMode 테스트 21종이 로비의 흐름을 검증하며, 설치 버전은 manifest의 태그로 고정합니다.
 
-### 3. [UI 스택 시스템](https://github.com/Frenil-client/unity-ui-system) - 게임에서 사용하는 UPM 패키지
+### 4. [UI 스택 시스템](https://github.com/Frenil-client/unity-ui-system) - 게임에서 사용하는 UPM 패키지
 
 레이어 캔버스, 정렬 순서 배정, 공유 Dim, 씬 소유권에 따른 UI 수명을 관리합니다.
 뷰 타입이 레이어를 정하고, 뷰가 가진 캔버스 수만큼 정렬 구간을 예약했다가 닫을 때 반납합니다.
@@ -62,7 +81,7 @@ EditMode 테스트 21종이 로비의 흐름을 검증하며, 설치 버전은 m
 
 **확인 방법:** 패키지 저장소의 `SampleLobby` 씬 또는 DefenceGame의 상점·조합·결과 팝업.
 
-### 4. [Spine FX 랩](https://github.com/Frenil-client/unity-spine-fx-lab) - 성능과 통합 투명 연출
+### 5. [Spine FX 랩](https://github.com/Frenil-client/unity-spine-fx-lab) - 성능과 통합 투명 연출
 
 Spine의 부위별 페이드에서 생기는 겹침을 RT 평탄화와 단일 알파 합성으로 처리하고,
 화면 밖 캐릭터의 애니메이션·메시 갱신 비용을 컬링으로 줄였습니다.
@@ -79,6 +98,7 @@ SRP Batcher 호환을 포기하는 대가와 해당 장면에서의 비교 계�
 
 | 저장소 | 역할 / 확인할 내용 |
 |---|---|
+| [unity-aim-combat-slice](https://github.com/Frenil-client/unity-aim-combat-slice) | 조준 사격과 무기 3종, 데이터로 조합하는 스킬과 단계형 버스트, Unity 비의존 Core 피해 계산, 보스 부위 파괴, 씬별 리소스 유지와 반환, 기존 패키지 3종 재사용 |
 | [unity-lobby-flow](https://github.com/Frenil-client/unity-lobby-flow) | Addressables 로컬/원격 그룹과 CCD 패치, 미리보기 요청과 리소스 반환, Jenkins 빌드와 업로드 검증, 재사용 배포 패키지 |
 | [unity-integration-demo](https://github.com/Frenil-client/unity-integration-demo) | 세 패키지의 연결, 로비 상태 변화, 구독 해제와 통합 테스트 |
 | [unity-ui-system](https://github.com/Frenil-client/unity-ui-system) | UI 스택·정렬 구간·씬 소유권·풀링, DefenceGame 적용 |
@@ -105,9 +125,11 @@ CI 구성 기준입니다. 최신 실행 결과는 각 워크플로에서 확인
 | [Stat CI](https://github.com/Frenil-client/unity-stat-system/actions/workflows/ci.yml) | 코어 빌드, 헤드리스 57종, 할당 벤치마크 | Unity 할당 테스트 6종, Mono·IL2CPP 실행 확인 |
 | [RedDot CI](https://github.com/Frenil-client/unity-reddot-system/actions/workflows/ci.yml) | 코어 빌드, 트리·진단 로직 47종 | Icon·Manager·EditorWindow의 Unity 동작 |
 | Lobby Flow (Jenkins) | 무결성 검사, EditMode 45종, PlayMode 13종. 콘텐츠 릴리스에서 v1/v2 빌드, CCD 업로드, 공개 주소의 해시와 파일 크기 검증 | Windows와 Android 실행 화면. iOS는 검증 전 |
+| Aim Combat Slice (Jenkins) | 무결성 검사, Windows와 Android의 Addressables 빌드와 개발 빌드, 산출물 보관 | 에디터 자동 플레이로 가로, 세로 화면 한 판 승리까지 오류 0, 블루스택에서 APK 가로, 세로 플레이 |
 
-Lobby Flow의 Jenkins는 개발 PC에 설치해 실행 결과 페이지가 공개되어 있지 않습니다. 실행 번호별 결과와 CCD 해시는
-[CCD 검증 기록](https://github.com/Frenil-client/unity-lobby-flow/blob/main/docs/records/2026-11-05-ccd-v1-v2.md)에 남겼습니다.
+Lobby Flow와 Aim Combat Slice의 Jenkins는 개발 PC에 설치해 실행 결과 페이지가 공개되어 있지 않습니다.
+Lobby Flow의 실행 번호별 결과와 CCD 해시는 [CCD 검증 기록](https://github.com/Frenil-client/unity-lobby-flow/blob/main/docs/records/2026-11-05-ccd-v1-v2.md)에,
+Aim Combat Slice의 빌드 화면과 단계별 소요 시간은 [README의 빌드 자동화 절](https://github.com/Frenil-client/unity-aim-combat-slice#빌드-자동화jenkins)에 남겼습니다.
 
 MVVM·Stat·RedDot의 헤드리스 테스트는 합계 124종입니다. `Tests~/`가 `Tests/`의 같은 소스를 컴파일하므로
 사본이 아니라 같은 테스트가 매 푸시마다 우분투 러너에서 돕니다.
@@ -134,4 +156,4 @@ MVVM·Stat·RedDot의 헤드리스 테스트는 합계 124종입니다. `Tests~/
 
 ## 기술 스택
 
-`Unity` `C#` `UGUI` `NGUI` `MVVM` `ScriptableObject` `Addressables` `Unity CCD` `Protobuf` `URP` `HLSL` `Spine` `UniTask` `DOTween` `GitHub Actions` `Jenkins`
+`Unity` `C#` `UGUI` `NGUI` `MVVM` `ScriptableObject` `Addressables` `Unity CCD` `Protobuf` `URP` `HLSL` `Spine` `Timeline` `UniTask` `DOTween` `GitHub Actions` `Jenkins`
