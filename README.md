@@ -21,7 +21,7 @@ silsen@naver.com, [GitHub](https://github.com/Frenil-client)
 
 | 분야 | 저장소 | 이 분야에서 볼 것 |
 |---|---|---|
-| [**대표 작업**](#대표-작업-aim-combat-slice) | [unity-aim-combat-slice](https://github.com/Frenil-client/unity-aim-combat-slice) | 아래 분야의 패키지와 기법을 전투 한 판에 모은 프로토타입 |
+| [**대표 작업**](#대표-작업-aim-combat-slice) | [unity-aim-combat-slice](https://github.com/Frenil-client/unity-aim-combat-slice) | 조준 사격 전투 프로토타입. UI 스택, 스탯, Lobby Flow 배포 패키지를 가져와 썼습니다 |
 | [**UI**](#ui) | [unity-ui-system](https://github.com/Frenil-client/unity-ui-system)<br>[unity-mvvm](https://github.com/Frenil-client/unity-mvvm)<br>[unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system)<br>[unity-integration-demo](https://github.com/Frenil-client/unity-integration-demo) | UI 스택과 정렬 구간, 데이터 바인딩, 알림 트리 집계를 게임 코드와 분리한 패키지, 그리고 세 패키지를 로비 화면 하나로 조립한 데모 |
 | [**그래픽스**](#그래픽스) | [unity-urp-shader-lab](https://github.com/Frenil-client/unity-urp-shader-lab)<br>[unity-spine-fx-lab](https://github.com/Frenil-client/unity-spine-fx-lab)<br>[unity-maplightdata-tool](https://github.com/Frenil-client/unity-maplightdata-tool) | HLSL로 작성한 NPR 셰이더와 아트 파이프라인 툴, Spine 통합 페이드와 컬링 성능, 씬 조명 저장과 복원 |
 | [**기타**](#기타) | [unity-lobby-flow](https://github.com/Frenil-client/unity-lobby-flow)<br>[unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | Addressables 원격 패치와 리소스 수명, Jenkins 빌드와 업로드 검증, 할당 없는 스탯 계산 |
@@ -44,13 +44,17 @@ UI, MVVM, 스탯, 레드닷은 독립 UPM 패키지입니다. UI는 Unity 6000.3
 스킬은 발동 블록과 효과를 조합한 데이터 에셋이고, 스킬 관리 창이 실행 중 로드와 같은 규칙으로 검증한 뒤 저장합니다.
 두 번째 스킬 세트(9종)는 코드 수정 없이 이 툴과 데이터만으로 추가했습니다.
 
-아래 분야별로 만든 패키지와 기법이 이 전투 한 판에서 만납니다.
+씬마다 기초 리소스 목록을 두고 다음 씬이 쓰는 리소스만 남겨, 다시 시작할 때 새로 불러오는 리소스가 0개입니다.
+화면 방향에 따라 기준 해상도를 돌리는 CanvasScaler 하위 클래스로 짧은 변을 1080에 맞추고 가로형과 세로형 배치를 바꿉니다.
+버스트 컷인과 보스 등장 연출은 Timeline 에셋이 움직임을 정하고 코드는 그림, 글, 색만 넣습니다.
 
-| 분야 | Aim Combat Slice에서 쓴 곳 |
+앞서 만든 패키지 세 개를 가져와 썼습니다.
+
+| 가져온 패키지 | 이 프로젝트에서 쓴 곳 |
 |---|---|
-| UI | [UI 스택](https://github.com/Frenil-client/unity-ui-system)으로 전투 화면, 스킬 세트 선택, 결과 팝업과 공유 Dim을 관리합니다. 화면 방향에 따라 기준 해상도를 돌리는 CanvasScaler 하위 클래스로 짧은 변을 1080에 맞추고 가로형과 세로형 배치를 바꿉니다 |
-| 그래픽스 | 피격 플래시를 툰 셰이더에 통합했고, 버스트 컷인과 보스 등장 연출은 Timeline 에셋이 움직임을 정하고 코드는 그림, 글, 색만 넣습니다 |
-| 기타 | [Lobby Flow](https://github.com/Frenil-client/unity-lobby-flow)의 배포 패키지로 Addressables 설정과 빌드 검사, Jenkins 템플릿을 가져왔습니다. 씬마다 기초 리소스 목록을 두고 다음 씬이 쓰는 리소스만 남겨, 다시 시작할 때 새로 불러오는 리소스가 0개입니다. 전투원 능력치는 [스탯](https://github.com/Frenil-client/unity-stat-system) 패키지 위에 상태효과를 모디파이어로 붙입니다 |
+| [UI 스택](https://github.com/Frenil-client/unity-ui-system) | 전투 화면, 스킬 세트 선택, 결과 팝업과 공유 Dim. 프리팹 공급원 인터페이스에 Addressables 구현을 꽂아 팝업을 주소로 엽니다 |
+| [스탯](https://github.com/Frenil-client/unity-stat-system) | 전투원 능력치. 공격력과 방어력을 기본값으로 두고 상태효과 합계를 모디파이어로 붙입니다 |
+| [Lobby Flow](https://github.com/Frenil-client/unity-lobby-flow)의 배포 패키지 | Addressables 설정과 빌드 검사, 리소스 핸들 묶음, Jenkins 템플릿 |
 
 **확인 방법:** 저장소의 [Release](https://github.com/Frenil-client/unity-aim-combat-slice/tree/main/Release) 폴더에 있는 Windows zip 또는 Android APK를 실행합니다.
 에디터에서는 Unity 6000.3.9f1에서 `Assets/Scenes/Boot.unity`를 실행합니다.
