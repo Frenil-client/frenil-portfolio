@@ -19,19 +19,13 @@ silsen@naver.com, [GitHub](https://github.com/Frenil-client)
 
 ## 분야별 저장소
 
-| 분야 | 저장소 | 확인할 내용 |
+| 분야 | 저장소 | 이 분야에서 볼 것 |
 |---|---|---|
-| [UI](#ui) | [unity-ui-system](https://github.com/Frenil-client/unity-ui-system) | UI 스택, 정렬 구간, 공유 Dim, 씬 소유권, 재사용 스크롤. DefenceGame과 Aim Combat Slice에서 사용 |
-| | [unity-mvvm](https://github.com/Frenil-client/unity-mvvm) | `Observable<T>`와 델타 목록 바인딩, Unity 비의존 ViewModel, View 구독 수명 |
-| | [unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system) | 트리 카운트 집계, 잠금, enum 계층 진단과 디버거 창 |
-| | [unity-integration-demo](https://github.com/Frenil-client/unity-integration-demo) | 스탯, MVVM, 레드닷 패키지를 로비 화면 하나로 조립 |
-| [그래픽스](#그래픽스) | [unity-urp-shader-lab](https://github.com/Frenil-client/unity-urp-shader-lab) | HLSL NPR 셰이더 4종, 포스트 3종, SDF 베이커와 스무딩 노멀 등 에디터 툴 6종 |
-| | [unity-spine-fx-lab](https://github.com/Frenil-client/unity-spine-fx-lab) | Spine 셰이더 연출 제어, RT 통합 페이드, 오프스크린 컬링 성능 비교 |
-| | [unity-maplightdata-tool](https://github.com/Frenil-client/unity-maplightdata-tool) | 씬 조명 SO 캡처, Primary/Additive 적용과 복원, Addressables 등록 도구 |
-| [기타](#기타) | [unity-lobby-flow](https://github.com/Frenil-client/unity-lobby-flow) | Addressables 로컬/원격 그룹과 CCD 패치, 비동기 로딩의 리소스 반환, Jenkins 플랫폼 빌드와 업로드 검증 |
-| | [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | long 고정소수점 저장, 기본값과 모디파이어 분리, 할당 없는 일괄 처리, 최종값 캐싱과 변경 통지 |
-| [종합](#대표-작업-aim-combat-slice) | [unity-aim-combat-slice](https://github.com/Frenil-client/unity-aim-combat-slice) | 세 분야의 패키지와 기법을 한 전투에 모은 프로토타입 |
-| [게임](#게임-프로토타입) | [DefenceGame](https://github.com/Frenil-client/DefenceGame), [minigames](https://github.com/Frenil-client/minigames) | 순수 C# Core와 실시간 전투의 경계, Additive 미니게임 진입 구조 |
+| [**대표 작업**](#대표-작업-aim-combat-slice) | [unity-aim-combat-slice](https://github.com/Frenil-client/unity-aim-combat-slice) | 아래 분야의 패키지와 기법을 전투 한 판에 모은 프로토타입 |
+| [**UI**](#ui) | [unity-ui-system](https://github.com/Frenil-client/unity-ui-system)<br>[unity-mvvm](https://github.com/Frenil-client/unity-mvvm)<br>[unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system)<br>[unity-integration-demo](https://github.com/Frenil-client/unity-integration-demo) | UI 스택과 정렬 구간, 데이터 바인딩, 알림 트리 집계를 게임 코드와 분리한 패키지, 그리고 세 패키지를 로비 화면 하나로 조립한 데모 |
+| [**그래픽스**](#그래픽스) | [unity-urp-shader-lab](https://github.com/Frenil-client/unity-urp-shader-lab)<br>[unity-spine-fx-lab](https://github.com/Frenil-client/unity-spine-fx-lab)<br>[unity-maplightdata-tool](https://github.com/Frenil-client/unity-maplightdata-tool) | HLSL로 작성한 NPR 셰이더와 아트 파이프라인 툴, Spine 통합 페이드와 컬링 성능, 씬 조명 저장과 복원 |
+| [**기타**](#기타) | [unity-lobby-flow](https://github.com/Frenil-client/unity-lobby-flow)<br>[unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | Addressables 원격 패치와 리소스 수명, Jenkins 빌드와 업로드 검증, 할당 없는 스탯 계산 |
+| [**게임**](#게임-프로토타입) | [DefenceGame](https://github.com/Frenil-client/DefenceGame)<br>[minigames](https://github.com/Frenil-client/minigames) | 순수 C# Core와 실시간 전투의 경계, Additive 미니게임 진입 구조 |
 
 UI, MVVM, 스탯, 레드닷은 독립 UPM 패키지입니다. UI는 Unity 6000.3 이상,
 나머지는 각 저장소에 적힌 Unity 최소 버전과 의존성을 따릅니다.
