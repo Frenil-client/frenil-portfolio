@@ -22,9 +22,10 @@ silsen@naver.com, [GitHub](https://github.com/Frenil-client)
 | 분야 | 저장소 | 이 분야에서 볼 것 |
 |---|---|---|
 | [**대표 작업**](#대표-작업-aim-combat-slice) | [unity-aim-combat-slice](https://github.com/Frenil-client/unity-aim-combat-slice) | 조준 사격 전투 프로토타입. UI 스택, 스탯, Addressables 배포 패키지를 가져와 썼습니다 |
+| [**플랫폼**](#플랫폼) | [unity-platform-services](https://github.com/Frenil-client/unity-platform-services) | 7개 플랫폼 서비스의 패키지 분리와 제공사 교체, 광고 보상과 구매 복구, Addressables 콘텐츠 배포 |
 | [**UI**](#ui) | [unity-ui-system](https://github.com/Frenil-client/unity-ui-system)<br>[unity-mvvm](https://github.com/Frenil-client/unity-mvvm)<br>[unity-reddot-system](https://github.com/Frenil-client/unity-reddot-system)<br>[unity-integration-demo](https://github.com/Frenil-client/unity-integration-demo) | UI 스택과 정렬 구간, 데이터 바인딩, 알림 트리 집계를 게임 코드와 분리한 패키지, 그리고 세 패키지를 로비 화면 하나로 조립한 데모 |
 | [**그래픽스**](#그래픽스) | [unity-urp-shader-lab](https://github.com/Frenil-client/unity-urp-shader-lab)<br>[unity-spine-fx-lab](https://github.com/Frenil-client/unity-spine-fx-lab)<br>[unity-maplightdata-tool](https://github.com/Frenil-client/unity-maplightdata-tool) | HLSL로 작성한 NPR 셰이더와 아트 파이프라인 툴, Spine 통합 페이드와 컬링 성능, 씬 조명 저장과 복원 |
-| [**기타**](#기타) | [unity-platform-services](https://github.com/Frenil-client/unity-platform-services)<br>[unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 7개 플랫폼 서비스의 패키지 분리와 제공사 교체, 광고 보상과 구매 복구, 콘텐츠 배포, 할당 없는 스탯 계산 |
+| [**기타**](#기타) | [unity-stat-system](https://github.com/Frenil-client/unity-stat-system) | 할당 없는 스탯 계산 |
 | [**게임**](#게임-프로토타입) | [DefenceGame](https://github.com/Frenil-client/DefenceGame)<br>[minigames](https://github.com/Frenil-client/minigames) | 순수 C# Core와 실시간 전투의 경계, Additive 미니게임 진입 구조 |
 
 UI, MVVM, 스탯, 레드닷은 독립 UPM 패키지입니다. UI는 Unity 6000.3 이상,
@@ -65,6 +66,51 @@ UI, MVVM, 스탯, 레드닷은 독립 UPM 패키지입니다. UI는 Unity 6000.3
 
 Jenkins는 개발 PC에 설치해 실행 결과 페이지가 공개되어 있지 않습니다.
 빌드 화면과 단계별 소요 시간은 [README의 빌드 자동화 절](https://github.com/Frenil-client/unity-aim-combat-slice#빌드-자동화jenkins)에 남겼습니다.
+
+## 플랫폼
+
+계정, 광고, 결제 같은 플랫폼 서비스를 게임 코드와 분리하고, 보상과 구매를 복구하고, 콘텐츠를 앱 업데이트 없이 바꾸는 작업입니다.
+아야카시 라이즈의 결제 상품과 구매 흐름, 애프터타임의 AdMob 보상형 광고와 플랫폼 서비스 연동 작업을 다룬 경험이 바탕입니다.
+
+### [Unity Platform Services](https://github.com/Frenil-client/unity-platform-services) - 필요한 기능만 붙이는 플랫폼 서비스 패키지
+
+![Android 로비: 테스트 광고 시청 후 데모 서버가 보석 30 지급](docs/images/platform-services-lobby.png)
+
+계정, 분석, 광고, 결제, 저장, 업적, 리소스를 독립 UPM 패키지로 나눴습니다.
+게임은 카테고리 인터페이스를 호출하고, 빌드 대상별 프로필이 Steam, Firebase, AdMob, Yandex, Unity IAP 등의 제공사를 고릅니다.
+카테고리는 서로 참조하지 않고, 제공사 어셈블리는 해당 SDK가 설치됐을 때만 컴파일됩니다.
+설정 창에서 쓸 카테고리를 설치하고 제공사를 적용하며, [카테고리 사용법](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/platform-services/usage/README.md)에 초기화부터 결과 처리까지 흐름도로 정리했습니다.
+
+광고는 1순위 제공사가 실패하면 같은 요청에서 다음 제공사로 넘어가고, 분석은 여러 제공사에 동시 전송합니다.
+광고 시청과 보상 지급, 스토어 결제와 게임 내 지급을 분리했습니다. 미확정 기록을 디스크에 남기고 다음 로그인 때 복구하며,
+서버 인터페이스에서 시청 ID와 거래 ID로 중복 지급을 막도록 했습니다. 지급 뒤 구매 확정만 실패하면 다음 복구에서 확정만 다시 합니다.
+광고와 결제 창, Steam 오버레이로 앱이 멈춘 시간은 타임아웃에서 제외합니다.
+
+| 확인 도구 | 역할 |
+|---|---|
+| [테스트 씬](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/platform-services/test-scene.md) | 모의 제공사와 서버로 응답 유실, 콜백 누락, 결제 직후 종료 등 엣지케이스 93개를 선택해 재현 |
+| [Lobby Flow](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/lobby-flow/lobby-demo.md) | 게스트 로그인, 광고 보상, 상점, 업적, 계정 전환, 챕터 콘텐츠 받기를 한 게임 흐름으로 연결 |
+
+기존 `unity-lobby-flow`의 콘텐츠 배포 데모는 이 저장소에 포함했습니다.
+v1 겨울에서 v2 봄으로 앱 재설치 없이 바꾸고, 중복 폰트와 셰이더를 분리해 챕터 2 다운로드를 약 2.9MB에서 21KB로 줄였습니다.
+미리보기의 늦은 응답 반환, Windows 개발 빌드 30회 왕복의 리소스 집계, Jenkins의 v1/v2 빌드와 CCD 업로드 검증도
+[콘텐츠 업데이트 문서](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/lobby-flow/content-update.md)에 보존했습니다.
+`com.frenil.addressables-delivery`는 [Aim Combat Slice](#대표-작업-aim-combat-slice)에서 다시 썼습니다.
+
+**확인 방법:** Unity 6000.3.9f1에서 테스트 씬 또는 Lobby Flow를 실행합니다.
+외부 프로젝트 적용은 [빠른 시작](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/platform-services/quickstart-check.md)을 따릅니다.
+SDK 없이 모의 제공사로 시작할 수 있고, 계정 검증과 광고 보상, 결제 지급에는 게임 서버 인터페이스를 연결합니다.
+
+### 플랫폼 검증 범위
+
+| 저장소 | 자동 검증 | 별도로 확인할 범위 |
+|---|---|---|
+| Platform Services | 2026-11-25 저장소 기록 기준 EditMode 311개, PlayMode 18개, 빈 프로젝트 카테고리 조합 컴파일 9개 통과. 테스트 씬의 수동 시나리오 93개와는 별도 | AdMob과 Yandex는 BlueStacks 테스트 광고, Unity IAP는 에디터 모의 스토어, 웹 결제는 모의 페이지, Steam은 앱 480, Firebase는 Android와 WebGL |
+
+실결제와 실제 게임 서버는 없습니다. 광고 보상과 결제 지급 규칙은 모의 서버와 클라이언트 내 데모 서버로 재현했습니다.
+광고의 실제 휴대폰 동작과 iOS, Steam 출시는 확인 범위 밖입니다.
+기존 콘텐츠 배포의 Jenkins 실행 번호와 CCD 해시는 [검증 기록](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/lobby-flow/records/2026-11-05-ccd-v1-v2.md)에 있습니다.
+Jenkins는 개발 PC에서 실행하므로 결과 페이지는 공개되어 있지 않습니다.
 
 ## UI
 
@@ -166,38 +212,7 @@ Additive 씬을 열고 닫을 때 스택 최상단의 조명을 적용했다가 
 
 ## 기타
 
-UI와 그래픽스 밖의 클라이언트 시스템입니다. 계정, 광고, 결제의 제공사를 어떻게 분리하고 보상과 구매를 어떻게 복구하는지,
-리소스를 언제 받고 언제 놓는지, 콘텐츠를 앱 업데이트 없이 어떻게 바꾸는지,
-플랫폼 빌드를 어떻게 재현하는지, 반복 계산에서 할당을 어떻게 없애는지를 다룹니다.
-
-### [Unity Platform Services](https://github.com/Frenil-client/unity-platform-services) - 필요한 기능만 붙이는 플랫폼 서비스 패키지
-
-![Android 로비: 테스트 광고 시청 후 데모 서버가 보석 30 지급](docs/images/platform-services-lobby.png)
-
-계정, 분석, 광고, 결제, 저장, 업적, 리소스를 독립 UPM 패키지로 나눴습니다.
-게임은 카테고리 인터페이스를 호출하고, 빌드 대상별 프로필이 Steam, Firebase, AdMob, Yandex, Unity IAP 등의 제공사를 고릅니다.
-카테고리는 서로 참조하지 않고, 제공사 어셈블리는 해당 SDK가 설치됐을 때만 컴파일됩니다.
-설정 창에서 쓸 카테고리를 설치하고 제공사를 적용하며, [카테고리 사용법](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/platform-services/usage/README.md)에 초기화부터 결과 처리까지 흐름도로 정리했습니다.
-
-광고는 1순위 제공사가 실패하면 같은 요청에서 다음 제공사로 넘어가고, 분석은 여러 제공사에 동시 전송합니다.
-광고 시청과 보상 지급, 스토어 결제와 게임 내 지급을 분리했습니다. 미확정 기록을 디스크에 남기고 다음 로그인 때 복구하며,
-서버 인터페이스에서 시청 ID와 거래 ID로 중복 지급을 막도록 했습니다. 지급 뒤 구매 확정만 실패하면 다음 복구에서 확정만 다시 합니다.
-광고와 결제 창, Steam 오버레이로 앱이 멈춘 시간은 타임아웃에서 제외합니다.
-
-| 확인 도구 | 역할 |
-|---|---|
-| [테스트 씬](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/platform-services/test-scene.md) | 모의 제공사와 서버로 응답 유실, 콜백 누락, 결제 직후 종료 등 엣지케이스 93개를 선택해 재현 |
-| [Lobby Flow](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/lobby-flow/lobby-demo.md) | 게스트 로그인, 광고 보상, 상점, 업적, 계정 전환, 챕터 콘텐츠 받기를 한 게임 흐름으로 연결 |
-
-기존 `unity-lobby-flow`의 콘텐츠 배포 데모는 이 저장소에 포함했습니다.
-v1 겨울에서 v2 봄으로 앱 재설치 없이 바꾸고, 중복 폰트와 셰이더를 분리해 챕터 2 다운로드를 약 2.9MB에서 21KB로 줄였습니다.
-미리보기의 늦은 응답 반환, Windows 개발 빌드 30회 왕복의 리소스 집계, Jenkins의 v1/v2 빌드와 CCD 업로드 검증도
-[콘텐츠 업데이트 문서](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/lobby-flow/content-update.md)에 보존했습니다.
-`com.frenil.addressables-delivery`는 [Aim Combat Slice](#대표-작업-aim-combat-slice)에서 다시 썼습니다.
-
-**확인 방법:** Unity 6000.3.9f1에서 테스트 씬 또는 Lobby Flow를 실행합니다.
-외부 프로젝트 적용은 [빠른 시작](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/platform-services/quickstart-check.md)을 따릅니다.
-SDK 없이 모의 제공사로 시작할 수 있고, 계정 검증과 광고 보상, 결제 지급에는 게임 서버 인터페이스를 연결합니다.
+UI와 그래픽스 밖의 클라이언트 시스템입니다. 반복 계산에서 할당을 어떻게 없애는지를 다룹니다.
 
 ### [스탯 시스템](https://github.com/Frenil-client/unity-stat-system) - 할당 없는 능력치 계산
 
@@ -213,13 +228,7 @@ SDK 없이 모의 제공사로 시작할 수 있고, 계정 검증과 광고 보
 
 | 저장소 | 자동 검증 | 별도로 확인할 범위 |
 |---|---|---|
-| Platform Services | 2026-11-25 저장소 기록 기준 EditMode 311개, PlayMode 18개, 빈 프로젝트 카테고리 조합 컴파일 9개 통과. 테스트 씬의 수동 시나리오 93개와는 별도 | AdMob과 Yandex는 BlueStacks 테스트 광고, Unity IAP는 에디터 모의 스토어, 웹 결제는 모의 페이지, Steam은 앱 480, Firebase는 Android와 WebGL |
 | [Stat CI](https://github.com/Frenil-client/unity-stat-system/actions/workflows/ci.yml) | 코어 빌드, 헤드리스 57종, 할당 벤치마크 | Unity 할당 테스트 6종, Mono와 IL2CPP 실행 확인 |
-
-실결제와 실제 게임 서버는 없습니다. 광고 보상과 결제 지급 규칙은 모의 서버와 클라이언트 내 데모 서버로 재현했습니다.
-광고의 실제 휴대폰 동작과 iOS, Steam 출시는 확인 범위 밖입니다.
-기존 콘텐츠 배포의 Jenkins 실행 번호와 CCD 해시는 [검증 기록](https://github.com/Frenil-client/unity-platform-services/blob/main/docs/lobby-flow/records/2026-11-05-ccd-v1-v2.md)에 있습니다.
-Jenkins는 개발 PC에서 실행하므로 결과 페이지는 공개되어 있지 않습니다.
 
 ## 게임 프로토타입
 
@@ -242,5 +251,6 @@ Jenkins는 개발 PC에서 실행하므로 결과 페이지는 공개되어 있�
 |---|---|
 | UI | `UGUI` `NGUI` `MVVM` |
 | 그래픽스 | `URP` `HLSL` `Spine` `Timeline` |
-| 기타 | `Steamworks.NET` `Firebase` `AdMob` `Yandex Mobile Ads` `Unity IAP` `Addressables` `Unity CCD` `Protobuf` `UniTask` `Jenkins` `GitHub Actions` |
+| 플랫폼 | `Steamworks.NET` `Firebase` `AdMob` `Yandex Mobile Ads` `Unity IAP` `Addressables` `Unity CCD` `Jenkins` |
+| 기타 | `Protobuf` `UniTask` `GitHub Actions` |
 | 공통 | `Unity` `C#` `ScriptableObject` `DOTween` |
